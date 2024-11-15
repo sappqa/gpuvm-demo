@@ -36,7 +36,8 @@ int main(int argc, char** argv) {
         std::cout << "Reserved virtual memory range of 2MiB from 0x" << std::hex << pvmRange << " to " << pvmRange + VM_RANGE << " this is a host virtual address space used to manage memory on the device" << std::endl;
         const unsigned int numpages = VM_RANGE / PAGE_SIZE;
         std::cout << "total num pages: " << std::dec << numpages << std::hex << std::endl;
-                
+        
+
         CUmemGenericAllocationHandle halloc;
         CUmemAllocationProp prop;
         prop.type = CU_MEM_ALLOCATION_TYPE_PINNED;
@@ -44,15 +45,27 @@ int main(int argc, char** argv) {
         // how do I optimize the size of this allocation? is there a specific size that performs better? how does the cuda driver handle this? does it pad allocations so they fit on boundaries? if so, what are the boundaries?
         // are these boundaries the same as the granularity, or is that different
         CU_CHECK(cuMemCreate(&halloc, PAGE_SIZE, &prop, 0));
-        std::cout << "Reserving 1 page of uvm space at 0x" << halloc << " this is a uvm address that gets mapped to either a host or device virtual address depending on who is accessing it." << std::endl;
+        std::cout << "Reserving 1 page of uvm space at 0x" << halloc << " this is a uvm address." << std::endl;
+
+        CUmemGenericAllocationHandle halloc2;
+        CU_CHECK(cuMemCreate(&halloc2, PAGE_SIZE, &prop, 0));
+        std::cout << "Reserving another page of uvm space at 0x" << halloc2 << " this is a uvm address." << std::endl;
 
         CU_CHECK(cuMemMap(pvmRange, PAGE_SIZE, 0, halloc, 0));
-        std::cout << "Map success" << std::endl;
-        cuMemUnmap(pvmRange, PAGE_SIZE);
+        std::cout << "Map1 success" << std::endl;
+
+        CU_CHECK(cuMemMap(pvmRange + PAGE_SIZE, PAGE_SIZE, 0, halloc2, 0));
+        std::cout << "Map2 success" << std::endl;
+
+        CU_CHECK(cuMemUnmap(pvmRange, VM_RANGE));
         std::cout << "Unmap success" << std::endl;
 
         CU_CHECK(cuMemRelease(halloc));
         std::cout << "Freed page at 0x" <<  halloc << std::endl;
+
+        CU_CHECK(cuMemRelease(halloc2));
+        std::cout << "Freed page at 0x" <<  halloc2 << std::endl;
+
         CU_CHECK(cuMemAddressFree(pvmRange, VM_RANGE));
         std::cout << "Freed virtual memory range." << std::endl;
         CU_CHECK(cuCtxDestroy(ctx));
