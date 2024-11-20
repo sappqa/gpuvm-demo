@@ -3,7 +3,7 @@
 #include "common.h"
 
 
-PageAllocator::PageAllocator(const size_t numPages) : numPages(numPages) {
+PageAllocator::PageAllocator(CUcontext& ctx, const size_t numPages) : numPages(numPages) {
     for (int i = 0; i < numPages; i++) {
         assertPush(i);
     }
@@ -43,9 +43,10 @@ void PageAllocator::unmapUvm(CUmemGenericAllocationHandle halloc) {
 
 CUmemGenericAllocationHandle PageAllocator::allocatePage() {
     CUmemGenericAllocationHandle halloc;
-    CUmemAllocationProp prop;
+    CUmemAllocationProp prop = {};
     prop.type = CU_MEM_ALLOCATION_TYPE_PINNED;
     prop.location.type = CU_MEM_LOCATION_TYPE_DEVICE;
+
     const int vpn = assertPop();
     CU_ASSERT(cuMemCreate(&halloc, PAGE_SIZE, &prop, 0));
     pageTable[halloc] = vpn;

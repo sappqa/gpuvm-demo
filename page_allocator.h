@@ -15,7 +15,7 @@ private:
     void unmapUvm(CUmemGenericAllocationHandle halloc);
 
 public:
-    PageAllocator(const size_t numPages);
+    PageAllocator(CUcontext& ctx, const size_t numPages);
     CUmemGenericAllocationHandle allocatePage();
     void freePage(CUmemGenericAllocationHandle ptr);
     ~PageAllocator();

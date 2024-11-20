@@ -26,10 +26,10 @@ int main(int argc, char** argv) {
         CU_ASSERT(cuCtxSetCurrent(ctx));
 
         const size_t numPages = 64;
-        PageAllocator* allocator = new PageAllocator(numPages);
+        PageAllocator* allocator = new PageAllocator(ctx, numPages);
         
-        // CUmemGenericAllocationHandle h1 = allocator->allocatePage();
-        // allocator->freePage(h1);
+        CUmemGenericAllocationHandle h1 = allocator->allocatePage();
+        allocator->freePage(h1);
 
         delete allocator;
         CU_ASSERT(cuCtxDestroy(ctx));
