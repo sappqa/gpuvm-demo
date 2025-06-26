@@ -8,13 +8,6 @@
 #include "page_allocator.h"
 
 
-// void allocator1_begin() {
-//     int durationSeconds = 5;
-//     for (int i = 0; i < durationSeconds; i++) {
-//         std::this_thread::sleep_for(std::chrono::seconds(1));
-//     }
-// }
-
 // nvcc gpuvm.cpp -o gpuvm -lcuda
 int main(int argc, char** argv) {
     try {
